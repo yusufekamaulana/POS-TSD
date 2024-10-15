@@ -188,8 +188,7 @@
         // Add event listener to the payment button
         document.querySelector('.btn-success').addEventListener('click', function() {
             // Get selected payment method
-            let selectedPayment = document.querySelector('.dropdown-menu .dropdown-item.active');
-            let paymentMethod = selectedPayment ? selectedPayment.textContent.trim() : 'Belum dipilih';
+            let paymentMethod = document.getElementById('paymentDropdown').textContent.trim();
 
             // Update modal with the selected payment method
             document.getElementById('paymentMethod').textContent = paymentMethod;
@@ -199,17 +198,17 @@
             myModal.show();
         });
 
-        // Update the dropdown button text when a payment method is selected
-        document.querySelectorAll('.dropdown-item').forEach(item => {
-            item.addEventListener('click', function() {
-                let paymentMethod = item.textContent.trim();
-                document.getElementById('paymentDropdown').textContent = paymentMethod;
+        // Update the dropdown button text when a payment method is selected using IDs
+        document.getElementById('qris').addEventListener('click', function() {
+            let paymentMethod = 'Pembayaran QRIS';
+            document.getElementById('paymentDropdown').textContent = paymentMethod;
+        });
 
-                // Remove active class from other items
-                document.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('active'));
-                item.classList.add('active');
-            });
+        document.getElementById('cash').addEventListener('click', function() {
+            let paymentMethod = 'Pembayaran Tunai';
+            document.getElementById('paymentDropdown').textContent = paymentMethod;
         });
     });
 </script>
+
 @endsection

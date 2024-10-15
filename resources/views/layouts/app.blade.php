@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="../../assets/vendors/font-awesome/css/font-awesome.min.css">
     <link rel="stylesheet" href="../../assets/vendors/mdi/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="../../assets/css/style.css">
-    <link rel="shortcut icon" href="../../assets/images/logo-mini.png" />
+    <link rel="shortcut icon" href="../../assets/images/favicon.png" />
 </head>
 
 <body>
@@ -123,13 +123,13 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="/stok">
                             <i class="icon-grid menu-icon mdi mdi-home-variant"></i>
                             <span class="menu-title">Kelola Stok</span>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" href="/produk">
                             <i class="icon-columns menu-icon"></i>
                             <span class="menu-title">Kelola Produk</span>
                         </a>
