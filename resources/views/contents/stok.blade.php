@@ -141,7 +141,7 @@
                 document.getElementById('labelJumlah').textContent = (mode === 'tambah' ? 'Jumlah Penambahan Stok' : 'Jumlah Pengurangan Stok');
 
                 // Set action form dengan id produk
-                document.getElementById('stokForm').action = "{{ url('stok') }}/" + kode;
+                document.getElementById('stokForm').action = "{{ url('kelola/stok') }}/" + kode;
             });
         });
 

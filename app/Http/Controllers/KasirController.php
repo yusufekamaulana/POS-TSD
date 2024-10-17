@@ -27,12 +27,13 @@ class KasirController extends Controller
     public function prosesPembayaran(Request $request)
     {
         $request->validate([
-            'payment_method' => 'required|string',
+            'payment_method' => 'required|string|in:Pembayaran Tunai,Pembayaran QRIS', // Validasi untuk payment_method
             'products' => 'required|array',
             'products.*.id' => 'required|string',
             'products.*.quantity' => 'required|integer|min:1',
             'products.*.price' => 'required|integer',
         ]);
+        
 
         // Get payment method and products from request
         $paymentMethod = $request->input('payment_method');

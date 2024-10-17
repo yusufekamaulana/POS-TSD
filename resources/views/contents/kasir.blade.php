@@ -1,15 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
+
 <div id="content-placeholder">
     <div class="col-lg-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <!-- Judul Kasir -->
                     <div class="col-lg-6 col-md-6">
                         <h2 class="text-primary font-weight-bold mb-0">Kasir</h2>
-                        <p class="card-description mt-0">Sabtu, 12 Oktober 2024</p>
+                        <p class="card-description mt-0">{{ \Carbon\Carbon::now()->format('l, d F Y') }}</p>
                     </div>
                     <!-- Search Bar -->
                     <div class="col-lg-6 col-md-6 d-flex justify-content-end">
@@ -22,7 +22,11 @@
                             </div>
                         </div>
                     </div>
-                    <div id="search-results" class="dropdown-menu mt-2" aria-labelledby="search-product"></div>
+                    <div class="col-lg-12 col-md-6 d-flex justify-content-end mt-0">
+                        <div class="input-group rounded-lg shadow-sm" style="max-width: 300px; max-height: 35px;">
+                            <div id="search-results" class="dropdown-menu mt-0 position-absolute w-100" aria-labelledby="search-product"></div>
+                        </div>
+                    </div>
                 </div>
                 <div class="table-responsive mt-2">
                     <table class="table table-striped table-hover">
@@ -30,44 +34,24 @@
                             <tr>
                                 <th> Gambar Produk </th>
                                 <th> Kode Barang </th>
-                                <th> Nama Barang </th> <!-- New column for product name -->
+                                <th> Nama Barang </th>
                                 <th> Harga </th>
                                 <th> Jumlah </th>
-                                <th> Diskon (%) </th> <!-- Kolom Diskon -->
                                 <th> Total </th>
                             </tr>
                         </thead>
                         <tbody>
-                            
+
                         </tbody>
                     </table>
                 </div>
 
-                <!-- Perincian Total Belanja -->
-                <div class="mt-4">
-                    <div class="row">
-                        <!-- Perincian Jumlah Asli -->
-                        <div class="col-lg-4">
-                            <div class="border p-3 rounded bg-light">
-                                <h5 class="text-dark font-weight-bold mb-1">Jumlah Asli:</h5>
-                                <p class="mb-0">Rp 1,250,000</p> <!-- Ini jumlah asli tanpa diskon -->
-                            </div>
-                        </div>
-
-                        <!-- Perincian Potongan Diskon -->
-                        <div class="col-lg-4">
-                            <div class="border p-3 rounded bg-light">
-                                <h5 class="text-dark font-weight-bold mb-1">Potongan Diskon:</h5>
-                                <p class="mb-0">Rp 208,750</p> <!-- Ini jumlah total diskon -->
-                            </div>
-                        </div>
-
-                        <!-- Total Pembayaran -->
-                        <div class="col-lg-4">
-                            <div class="border p-3 rounded bg-primary text-white">
-                                <h4 class="font-weight-bold mb-1">Total Pembayaran:</h4>
-                                <h3 class="font-weight-bold mb-0">Rp 1,041,250</h3> <!-- Total setelah diskon -->
-                            </div>
+                <!-- Total Pembayaran -->
+                <div class="mt-4 d-flex justify-content-end">
+                    <div class="col-lg-4">
+                        <div class="border p-3 rounded bg-primary text-white">
+                            <h4 class="font-weight-bold mb-1">Total Pembayaran:</h4>
+                            <h3 class="font-weight-bold mb-0" id="total-payment">Rp 0</h3>
                         </div>
                     </div>
                 </div>
@@ -98,7 +82,7 @@
 
                 <!-- Tombol Proses Pembayaran -->
                 <div class="mt-4 d-flex justify-content-end">
-                    <button type="button" class="btn btn-success btn-lg text-white">Proses Pembayaran</button>
+                    <button type="button" class="btn btn-success btn-lg text-white" id="processPaymentBtn" disabled>Proses Pembayaran</button>
                 </div>
 
             </div>
@@ -109,34 +93,96 @@
     <div class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="receiptModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
+                <!-- Isi Modal -->
                 <div class="modal-header">
-                    <h5 class="modal-title" id="receiptModalLabel">Struk Pembayaran</h5>
+                    <h5 class="modal-title" id="receiptModalLabel">Transaksi Berhasil</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <p>Terima kasih atas pembayaran Anda!</p>
-                    <p><strong>Jumlah Asli:</strong> Rp 1,250,000</p>
-                    <p><strong>Potongan Diskon:</strong> Rp 208,750</p>
-                    <p><strong>Total Pembayaran:</strong> Rp 1,041,250</p>
+                <div class="modal-body text-center">
+                    <!-- Icon Sukses -->
+                    <i class="mdi mdi-checkbox-marked-circle-outline" style="color: green; font-size: 100px;"></i>
+                    <p class="mt-3"><strong>Total Pembayaran:</strong> <span id="modal-total-payment">Rp 0</span></p>
                     <p><strong>Metode Pembayaran:</strong> <span id="paymentMethod"></span></p>
-                    <p>Silakan simpan struk ini sebagai bukti pembayaran.</p>
+                    <p>Cetak struk ini sebagai bukti pembayaran!</p>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-danger text-white" data-bs-dismiss="modal">Tutup</button>
                     <button type="button" class="btn btn-primary">Cetak Struk</button>
                 </div>
             </div>
         </div>
     </div>
+
 </div>
+
+<!-- JavaScript -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Add event listener to the payment button
+        // Fungsi untuk memperbarui total pembayaran
+        function updateTotal() {
+            let tableRows = document.querySelectorAll('table tbody tr');
+            let grandTotal = 0;
+
+            tableRows.forEach(function(row) {
+                let priceCell = row.cells[3].textContent.replace('Rp ', '').replace('.', '').replace(',', '');
+                let quantityInput = row.querySelector('input.quantity-input');
+                let quantity = quantityInput ? parseInt(quantityInput.value) : 0;
+
+                // Hitung total per baris
+                let total = (parseFloat(priceCell) * quantity) || 0;
+
+                // Perbarui sel total per baris
+                row.cells[5].textContent = 'Rp ' + total.toLocaleString('id-ID');
+
+                // Tambahkan ke grand total
+                grandTotal += total;
+            });
+
+            // Perbarui total pembayaran
+            document.getElementById('total-payment').textContent = 'Rp ' + grandTotal.toLocaleString('id-ID');
+        }
+
+        // Ambil elemen tombol dan dropdown
+        const processPaymentBtn = document.getElementById('processPaymentBtn');
+        const paymentDropdown = document.getElementById('paymentDropdown');
+
+        function checkProductInTable() {
+            let tableRows = document.querySelectorAll('table tbody tr');
+            return tableRows.length > 0; // Mengembalikan true jika ada produk di tabel
+        }
+
+
+        function updatePaymentButtonState() {
+            let paymentMethodSelected = paymentDropdown.textContent.trim() !== 'Pilih Metode Pembayaran';
+            let hasProducts = checkProductInTable();
+
+            // Aktifkan tombol hanya jika metode pembayaran dipilih dan ada produk di tabel
+            processPaymentBtn.disabled = !(paymentMethodSelected && hasProducts);
+        }
+
+
+        // Event listener untuk pilihan metode pembayaran
+        document.getElementById('qris').addEventListener('click', function() {
+            let paymentMethod = 'Pembayaran QRIS';
+            paymentDropdown.textContent = paymentMethod;
+            updatePaymentButtonState(); // Perbarui status tombol setelah memilih metode
+        });
+
+        document.getElementById('cash').addEventListener('click', function() {
+            let paymentMethod = 'Pembayaran Tunai';
+            paymentDropdown.textContent = paymentMethod;
+            updatePaymentButtonState(); // Perbarui status tombol setelah memilih metode
+        });
+
+        // Event listener untuk tombol Proses Pembayaran
         document.querySelector('.btn-success').addEventListener('click', function() {
             let paymentMethod = document.getElementById('paymentDropdown').textContent.trim();
-            console.log(paymentMethod);
             document.getElementById('paymentMethod').textContent = paymentMethod;
-            
+
+            // Perbarui total pembayaran di modal
+            let totalPayment = document.getElementById('total-payment').textContent;
+            document.getElementById('modal-total-payment').textContent = totalPayment;
+
             var myModal = new bootstrap.Modal(document.getElementById('receiptModal'));
             myModal.show();
 
@@ -145,9 +191,8 @@
 
             tableRows.forEach(function(row) {
                 let productId = row.cells[1].textContent;
-                let quantity = row.cells[4].querySelectorAll('input.form-control')[0].value;
-                let price = row.cells[6].textContent.replace('Rp ', '').replace('.', '');
-                console.log(quantity)
+                let quantity = row.cells[4].querySelector('input.form-control').value;
+                let price = row.cells[5].textContent.replace('Rp ', '').replace('.', '').replace(',', '');
 
                 products.push({
                     id: productId,
@@ -156,28 +201,29 @@
                 });
             });
 
-            fetch('{{ route('kasir.prosespembayaran') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({
-                    payment_method: paymentMethod,
-                    products: products
+            fetch('{{ route('kasir.prosespembayaran')}}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            payment_method: paymentMethod,
+                            products: products
+                        })
+                    })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Pembayaran berhasil diproses.');
+                    } else {
+                        alert('Terjadi kesalahan saat memproses pembayaran.');
+                    }
                 })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log('Payment processed');
-                } else {
-                    alert('Error processing payment.');
-                }
-            })
-            .catch(error => console.error('Error:', error));
+                .catch(error => console.error('Error:', error));
         });
 
+        // Event listener untuk pilihan metode pembayaran
         document.getElementById('qris').addEventListener('click', function() {
             let paymentMethod = 'Pembayaran QRIS';
             document.getElementById('paymentDropdown').textContent = paymentMethod;
@@ -188,6 +234,7 @@
             document.getElementById('paymentDropdown').textContent = paymentMethod;
         });
 
+        // Fungsi pencarian produk
         let searchInput = document.getElementById('search-product');
         let searchResults = document.getElementById('search-results');
 
@@ -203,91 +250,66 @@
                         if (data.length > 0) {
                             data.forEach(product => {
                                 let resultItem = `
-                                    <div class="dropdown-item product-result mb-2" data-id="${product.product_id}" data-name="${product.product_name}" data-price="${product.price}" data-quantity="${product.quantity_in_stock}">
-                                        <p class="mb-0"><strong>${product.product_name}</strong></p>
-                                        <p class="mb-0">ID: ${product.product_id}</p>
-                                        <p class="mb-0">Harga: Rp ${product.price}</p>
-                                        <p class="mb-0">Stock: Rp ${product.quantity_in_stock}</p>
-                                    </div>`;
+                                <div class="dropdown-item product-result mb-2" data-id="${product.product_id}" data-name="${product.product_name}" data-price="${product.harga_jual}" data-quantity="${product.quantity_in_stock}">
+                                    <p class="mb-0"><strong>${product.product_name}</strong></p>
+                                    <p class="mb-0">ID: ${product.product_id}</p>
+                                    <p class="mb-0">Harga: Rp ${product.harga_jual}</p>
+                                    <p class="mb-0">Stok: ${product.quantity_in_stock}</p>
+                                </div>`;
                                 searchResults.innerHTML += resultItem;
-                                
                             });
                         } else {
-                            searchResults.innerHTML = '<p>No products found</p>';
+                            searchResults.innerHTML = '<p>Produk tidak ditemukan</p>';
                         }
                     })
                     .catch(error => console.error('Error:', error));
-                searchResults.classList.add('show'); 
+                searchResults.classList.add('show');
             } else {
                 searchResults.innerHTML = '';
-                searchResults.classList.remove('show'); 
+                searchResults.classList.remove('show');
             }
         });
 
-        let quantityInput = document.querySelectorAll('quantity-input');
-
-        function updateTotal() {
-            let tableRows = document.querySelectorAll('table tbody tr');
-            let grandTotal = 0;
-
-            tableRows.forEach(function(row) {
-                let priceCell = row.cells[3].textContent.replace('Rp ', '');
-                let quantityInput = row.querySelector('input.quantity-input');
-                let quantity = quantityInput ? quantityInput.value : 0;
-
-                // Calculate total for this row
-                let total = (parseFloat(priceCell) * parseInt(quantity)) || 0;
-
-                // Update the total cell for this row
-                row.cells[6].textContent = 'Rp ' + total.toLocaleString().replace(',', ''); // Update total column with formatted total
-
-                // Add to grand total
-                grandTotal += total;
-            });
-
-            // Update the grand total in the summary section
-            document.querySelector('.font-weight-bold.mb-0').textContent = 'Rp ' + grandTotal.toLocaleString(); // Assuming this is where the total is displayed
-        }
-
-        // Add event listeners to quantity inputs after adding rows
-        document.querySelector('table tbody').addEventListener('input', function(event) {
-            if (event.target.classList.contains('quantity-input')) {
-                updateTotal(); // Call updateTotal when quantity changes
-            }
-        });
-
+        // Event listener untuk menambahkan produk dari hasil pencarian ke tabel
         searchResults.addEventListener('click', function(event) {
             if (event.target.closest('.product-result')) {
                 let selectedProduct = event.target.closest('.product-result');
                 let productId = selectedProduct.getAttribute('data-id');
                 let productName = selectedProduct.getAttribute('data-name');
-                let productPrice = selectedProduct.getAttribute('data-price').replace('.00', '');
+                let productPrice = selectedProduct.getAttribute('data-price');
                 let productStock = selectedProduct.getAttribute('data-quantity');
 
-                // Add the product to the table
+                // Tambahkan produk ke tabel
                 let tableBody = document.querySelector('table tbody');
                 let newRow = `
                     <tr>
                         <td><img src="../../assets/images/default-product.jpg" alt="${productName}" style="width: 50px; height: 50px;"></td>
                         <td>${productId}</td>
                         <td>${productName}</td>
-                        <td>Rp ${productPrice}</td>
+                        <td>Rp ${parseInt(productPrice).toLocaleString('id-ID')}</td>
                         <td><input type="number" value="1" class="form-control quantity-input" min="1" max="${productStock}"></td>
-                        <td>0</td>
-                        <td>Rp ${productPrice}</td>
+                        <td>Rp ${parseInt(productPrice).toLocaleString('id-ID')}</td>
                     </tr>`;
                 tableBody.insertAdjacentHTML('beforeend', newRow);
 
-                // Clear the search input and results
+                updateTotal(); // Perbarui total setelah menambahkan produk
+                updatePaymentButtonState();
+
+                // Kosongkan input pencarian dan hasil
                 searchInput.value = '';
                 searchResults.innerHTML = '';
-                searchResults.classList.remove('show'); // Hide dropdown
+                searchResults.classList.remove('show'); // Sembunyikan dropdown
             }
         });
 
-        
+        // Event listener untuk perubahan jumlah pada input quantity
+        document.querySelector('table tbody').addEventListener('input', function(event) {
+            if (event.target.classList.contains('quantity-input')) {
+                updateTotal(); // Panggil updateTotal saat jumlah berubah
+                updatePaymentButtonState();
+            }
+        });
     });
-
 </script>
 
 @endsection

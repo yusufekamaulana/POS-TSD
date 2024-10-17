@@ -30235,3 +30235,25 @@ table.dataTable tbody td.select-checkbox:after {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
+
+#search-results {
+  max-height: 300px;
+  /* Batas tinggi dropdown */
+  overflow-y: auto;
+  /* Scroll jika terlalu panjang */
+  display: none;
+  /* Awalnya disembunyikan */
+  z-index: 1000;
+  /* Agar muncul di atas elemen lainnya */
+}
+
+#search-results.show {
+  display: block;
+  /* Tampilkan dropdown saat ada hasil */
+}
+
+.product-result {
+  cursor: pointer;
+  /* Kursor berubah saat hover di produk */
+}

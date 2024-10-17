@@ -67,6 +67,7 @@
                 <div class="rounded position-relative h-100 shadow-lg clickable-box">
                     <div class="book-img">
                         <img src="{{$product->gambar}}" class="img-fluid w-100 rounded-top" alt="{{ $product->product_name }}">
+                        <div class="text-white bg-dark px-3 py-1 rounded position-absolute" style="bottom: 75px; left: 10px;">{{ $product->category->category_name }}</div>
                     </div>
                     
                     <!-- Edit and Delete Icons -->
@@ -82,15 +83,11 @@
                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus produk ini?')">
                                 <i class="mdi mdi-delete"></i>
                             </button>
-                        </form>
-                        
+                        </form>                        
                     </div>
-
-                    <div class="text-white bg-dark px-3 py-1 rounded position-absolute" style="top: 10px; left: 10px;">{{ $product->product_name }}</div>
                     <div class="p-2 border bg-light border-light border-top-0 rounded-bottom d-flex flex-column">
-                        <h5 class="text-wrapped text-center">{{ $product->product_name }}</h5>
+                        <h4 class="text-center">{{ $product->product_name }}</h4>
                         <span class="text-center">Rp. {{ number_format($product->harga_jual, 0, ',', '.') }}</span>
-                        <p class="text-muted text-center">{{ $product->deskripsi }}</p>
                     </div>
                 </div>
             </div>
