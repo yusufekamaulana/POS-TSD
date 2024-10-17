@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id('order_id'); // Unsigned Big Integer (primary key)
-            $table->foreignId('user_id')->constrained('users', 'user_id')->onDelete('cascade'); // Foreign key constraint
+            // $table->foreignId('user_id')->constrained('users', 'user_id')->onDelete('cascade')->nullable(); // Foreign key constraint
             $table->timestamp('order_date')->useCurrent();
             $table->timestamps();
         });

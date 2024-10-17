@@ -16,8 +16,10 @@ class Product extends Model
         'price',
         'category_id',
         'quantity_in_stock',
+        'gambar',
         'harga_beli',
-        'harga_jual'
+        'harga_jual',
+        'deskripsi',
     ];
 
     // A product belongs to a category

@@ -12,22 +12,23 @@ return new class extends Migration
     public function up()
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->id('product_id');  // Unsigned Big Integer (primary key)
-            $table->string('product_name');
-            $table->decimal('price', 8, 2);
-            $table->unsignedBigInteger('category_id');  // Foreign key to categories table
+            $table->id('product_id');  // Primary Key
+            $table->string('product_name')->unique();
+            $table->unsignedBigInteger('category_id');  // Foreign key ke categories table
             $table->foreign('category_id')->references('category_id')->on('categories')->onDelete('cascade');
-            $table->integer('quantity_in_stock')->default(0);  // New column for quantity in stock
-            $table->decimal('harga_beli', 10, 2);  // New column for purchase price (harga_beli)
-            $table->decimal('harga_jual', 10, 2);  // New column for selling price (harga_jual)
-            $table->timestamps();
+            $table->integer('quantity_in_stock')->default(0);  // Jumlah stok
+            $table->decimal('harga_beli', 10, 2);  // Harga beli
+            $table->decimal('harga_jual', 10, 2);  // Harga jual
+            $table->string('gambar')->nullable();  // Kolom untuk menyimpan nama file gambar
+            $table->text('deskripsi')->nullable();  // Kolom deskripsi produk
+            $table->timestamps();  // created_at dan updated_at
         });
     }
 
     /**
      * Reverse the migrations.
      */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('products');
     }

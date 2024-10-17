@@ -14,8 +14,7 @@
                     <!-- Search Bar -->
                     <div class="col-lg-6 col-md-6 d-flex justify-content-end">
                         <div class="input-group rounded-lg shadow-sm" style="max-width: 300px; max-height: 35px;">
-                            <input type="text" class="form-control h-50" id="navbar-search-input"
-                                placeholder="Cari Produk" aria-label="search" aria-describedby="search">
+                            <input type="text" class="form-control h-50" id="search-product" placeholder="Cari Produk" aria-label="search" aria-describedby="search">
                             <div class="input-group-prepend hover-cursor h-50">
                                 <span class="input-group-text bg-primary text-white h-100 d-flex align-items-center justify-content-center">
                                     <i class="icon-search"></i>
@@ -23,6 +22,7 @@
                             </div>
                         </div>
                     </div>
+                    <div id="search-results" class="dropdown-menu mt-2" aria-labelledby="search-product"></div>
                 </div>
                 <div class="table-responsive mt-2">
                     <table class="table table-striped table-hover">
@@ -38,61 +38,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="py-1">
-                                    <img src="../../assets/images/samples/300x300/1.jpg" alt="image" class="w-20 h-25 object-cover rounded">
-                                </td>
-                                <td> PRD001 </td>
-                                <td> Nama Barang 1 </td> <!-- Product name -->
-                                <td> Rp 50,000 </td>
-                                <td> 2 </td>
-                                <td> 10 </td> <!-- Diskon -->
-                                <td> Rp 90,000 </td> <!-- Total Setelah Diskon -->
-                            </tr>
-                            <tr>
-                                <td class="py-1">
-                                    <img src="../../assets/images/samples/300x300/2.jpg" alt="image" class="w-20 h-25 object-cover rounded">
-                                </td>
-                                <td> PRD002 </td>
-                                <td> Nama Barang 2 </td> <!-- Product name -->
-                                <td> Rp 75,000 </td>
-                                <td> 1 </td>
-                                <td> 5 </td> <!-- Diskon -->
-                                <td> Rp 71,250 </td> <!-- Total Setelah Diskon -->
-                            </tr>
-                            <tr>
-                                <td class="py-1">
-                                    <img src="../../assets/images/samples/300x300/3.jpg" alt="image" class="w-20 h-25 object-cover rounded">
-                                </td>
-                                <td> PRD003 </td>
-                                <td> Nama Barang 3 </td> <!-- Product name -->
-                                <td> Rp 120,000 </td>
-                                <td> 3 </td>
-                                <td> 0 </td> <!-- Tidak ada diskon -->
-                                <td> Rp 360,000 </td> <!-- Total Tetap -->
-                            </tr>
-                            <tr>
-                                <td class="py-1">
-                                    <img src="../../assets/images/samples/300x300/4.jpg" alt="image" class="w-20 h-25 object-cover rounded">
-                                </td>
-                                <td> PRD004 </td>
-                                <td> Nama Barang 4 </td> <!-- Product name -->
-                                <td> Rp 200,000 </td>
-                                <td> 2 </td>
-                                <td> 15 </td> <!-- Diskon -->
-                                <td> Rp 340,000 </td> <!-- Total Setelah Diskon -->
-                            </tr>
-                            <tr>
-                                <td class="py-1">
-                                    <img src="../../assets/images/samples/300x300/5.jpg" alt="image" class="w-20 h-25 object-cover rounded">
-                                </td>
-                                <td> PRD005 </td>
-                                <td> Nama Barang 5 </td> <!-- Product name -->
-                                <td> Rp 45,000 </td>
-                                <td> 5 </td>
-                                <td> 20 </td> <!-- Diskon -->
-                                <td> Rp 180,000 </td> <!-- Total Setelah Diskon -->
-                            </tr>
+                            
                         </tbody>
                     </table>
                 </div>
@@ -187,18 +133,51 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Add event listener to the payment button
         document.querySelector('.btn-success').addEventListener('click', function() {
-            // Get selected payment method
             let paymentMethod = document.getElementById('paymentDropdown').textContent.trim();
-
-            // Update modal with the selected payment method
+            console.log(paymentMethod);
             document.getElementById('paymentMethod').textContent = paymentMethod;
-
-            // Show the modal
+            
             var myModal = new bootstrap.Modal(document.getElementById('receiptModal'));
             myModal.show();
+
+            let tableRows = document.querySelectorAll('table tbody tr');
+            let products = [];
+
+            tableRows.forEach(function(row) {
+                let productId = row.cells[1].textContent;
+                let quantity = row.cells[4].querySelectorAll('input.form-control')[0].value;
+                let price = row.cells[6].textContent.replace('Rp ', '').replace('.', '');
+                console.log(quantity)
+
+                products.push({
+                    id: productId,
+                    quantity: quantity,
+                    price: price,
+                });
+            });
+
+            fetch('{{ route('kasir.prosespembayaran') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    payment_method: paymentMethod,
+                    products: products
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Payment processed');
+                } else {
+                    alert('Error processing payment.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
         });
 
-        // Update the dropdown button text when a payment method is selected using IDs
         document.getElementById('qris').addEventListener('click', function() {
             let paymentMethod = 'Pembayaran QRIS';
             document.getElementById('paymentDropdown').textContent = paymentMethod;
@@ -208,7 +187,107 @@
             let paymentMethod = 'Pembayaran Tunai';
             document.getElementById('paymentDropdown').textContent = paymentMethod;
         });
+
+        let searchInput = document.getElementById('search-product');
+        let searchResults = document.getElementById('search-results');
+
+        searchInput.addEventListener('keyup', function() {
+            let query = searchInput.value.trim();
+
+            if (query.length > 0) {
+                fetch(`{{ route('kasir.search') }}?query=` + query)
+                    .then(response => response.json())
+                    .then(data => {
+                        searchResults.innerHTML = '';
+
+                        if (data.length > 0) {
+                            data.forEach(product => {
+                                let resultItem = `
+                                    <div class="dropdown-item product-result mb-2" data-id="${product.product_id}" data-name="${product.product_name}" data-price="${product.price}" data-quantity="${product.quantity_in_stock}">
+                                        <p class="mb-0"><strong>${product.product_name}</strong></p>
+                                        <p class="mb-0">ID: ${product.product_id}</p>
+                                        <p class="mb-0">Harga: Rp ${product.price}</p>
+                                        <p class="mb-0">Stock: Rp ${product.quantity_in_stock}</p>
+                                    </div>`;
+                                searchResults.innerHTML += resultItem;
+                                
+                            });
+                        } else {
+                            searchResults.innerHTML = '<p>No products found</p>';
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                searchResults.classList.add('show'); 
+            } else {
+                searchResults.innerHTML = '';
+                searchResults.classList.remove('show'); 
+            }
+        });
+
+        let quantityInput = document.querySelectorAll('quantity-input');
+
+        function updateTotal() {
+            let tableRows = document.querySelectorAll('table tbody tr');
+            let grandTotal = 0;
+
+            tableRows.forEach(function(row) {
+                let priceCell = row.cells[3].textContent.replace('Rp ', '');
+                let quantityInput = row.querySelector('input.quantity-input');
+                let quantity = quantityInput ? quantityInput.value : 0;
+
+                // Calculate total for this row
+                let total = (parseFloat(priceCell) * parseInt(quantity)) || 0;
+
+                // Update the total cell for this row
+                row.cells[6].textContent = 'Rp ' + total.toLocaleString().replace(',', ''); // Update total column with formatted total
+
+                // Add to grand total
+                grandTotal += total;
+            });
+
+            // Update the grand total in the summary section
+            document.querySelector('.font-weight-bold.mb-0').textContent = 'Rp ' + grandTotal.toLocaleString(); // Assuming this is where the total is displayed
+        }
+
+        // Add event listeners to quantity inputs after adding rows
+        document.querySelector('table tbody').addEventListener('input', function(event) {
+            if (event.target.classList.contains('quantity-input')) {
+                updateTotal(); // Call updateTotal when quantity changes
+            }
+        });
+
+        searchResults.addEventListener('click', function(event) {
+            if (event.target.closest('.product-result')) {
+                let selectedProduct = event.target.closest('.product-result');
+                let productId = selectedProduct.getAttribute('data-id');
+                let productName = selectedProduct.getAttribute('data-name');
+                let productPrice = selectedProduct.getAttribute('data-price').replace('.00', '');
+                let productStock = selectedProduct.getAttribute('data-quantity');
+
+                // Add the product to the table
+                let tableBody = document.querySelector('table tbody');
+                let newRow = `
+                    <tr>
+                        <td><img src="../../assets/images/default-product.jpg" alt="${productName}" style="width: 50px; height: 50px;"></td>
+                        <td>${productId}</td>
+                        <td>${productName}</td>
+                        <td>Rp ${productPrice}</td>
+                        <td><input type="number" value="1" class="form-control quantity-input" min="1" max="${productStock}"></td>
+                        <td>0</td>
+                        <td>Rp ${productPrice}</td>
+                    </tr>`;
+                tableBody.insertAdjacentHTML('beforeend', newRow);
+
+                // Clear the search input and results
+                searchInput.value = '';
+                searchResults.innerHTML = '';
+                searchResults.classList.remove('show'); // Hide dropdown
+            }
+        });
+
+        
     });
+
 </script>
 
 @endsection
