@@ -6,10 +6,17 @@ use App\Http\Controllers\KaryawanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\KasirController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/', [AuthController::class, 'login'])->name('login.submit');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+
+
+Route::get('/dashboard/laporan-harian', [DashboardController::class, 'laporanHarian']);
+Route::get('/dashboard/laporan-bulanan', [DashboardController::class, 'laporanBulanan']);
+Route::get('/dashboard/produk-laporan', [DashboardController::class, 'produkLaporan']);
+
 
 Route::get('/search-products', [KasirController::class, 'search'])->name('kasir.search');
 Route::post('/kasir/proses-pembayaran', [KasirController::class, 'prosesPembayaran'])->name('kasir.prosespembayaran');
