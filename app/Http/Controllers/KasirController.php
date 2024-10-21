@@ -15,14 +15,15 @@ class KasirController extends Controller
         // Get the search query
         $searchTerm = $request->get('query');
 
-        // Search for products by product name
+        // Ensure that the search term is treated as a string for product_id comparison
         $products = Product::where('product_name', 'LIKE', '%' . $searchTerm . '%')
-            ->orWhere('product_id', $searchTerm)
+            ->orWhereRaw("CAST(product_id AS CHAR) LIKE ?", ['%' . $searchTerm . '%'])
             ->get();
 
         // Return the search result as JSON
         return response()->json($products);
     }
+
 
     public function prosesPembayaran(Request $request)
     {
@@ -33,7 +34,7 @@ class KasirController extends Controller
             'products.*.quantity' => 'required|integer|min:1',
             'products.*.price' => 'required|integer',
         ]);
-        
+
 
         // Get payment method and products from request
         $paymentMethod = $request->input('payment_method');
@@ -42,7 +43,7 @@ class KasirController extends Controller
         } elseif ($paymentMethod == 'Pembayaran QRIS') {
             $paymentMethod = 'credit_card';
         }
-          
+
         $products = $request->input('products');
 
         $totalAmount = 0;
@@ -60,11 +61,11 @@ class KasirController extends Controller
             $priceProduct = $product['price'];
 
             $existingProduct = Product::where('product_id', $idProduct)->first();
-    
+
             if ($existingProduct) {
                 // Subtract the purchased quantity from the current stock
                 $newStock = $existingProduct->quantity_in_stock - $quantityProduct;
-    
+
                 // Update the stock only if the new stock is not negative
                 if ($newStock >= 0) {
                     $existingProduct->update(['quantity_in_stock' => $newStock]);
@@ -85,9 +86,8 @@ class KasirController extends Controller
             ]);
 
             $totalAmount += $priceProduct;
-
         }
-        
+
         $payment = Payment::create([
             'order_id' => $order->order_id,
             'payment_date' => today(),

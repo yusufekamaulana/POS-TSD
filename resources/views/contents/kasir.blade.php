@@ -38,6 +38,7 @@
                                 <th> Harga </th>
                                 <th> Jumlah </th>
                                 <th> Total </th>
+                                <th> Aksi </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -66,7 +67,7 @@
                         <ul class="dropdown-menu" aria-labelledby="paymentDropdown">
                             <li>
                                 <a class="dropdown-item d-flex align-items-center" href="#" id="qris" value="qris">
-                                    <img src="../../assets/images/qris.png" alt="QRIS" class="me-2" style="width: 30px; height: 30px;">
+                                    <img src="{{ asset('assets/images/qris.png') }}" alt="QRIS" class="me-2" style="width: 30px; height: 30px;">
                                     Pembayaran QRIS
                                 </a>
                             </li>
@@ -160,6 +161,19 @@
             processPaymentBtn.disabled = !(paymentMethodSelected && hasProducts);
         }
 
+        document.addEventListener('input', function(event) {
+            if (event.target.classList.contains('quantity-input')) {
+                let maxStock = parseInt(event.target.getAttribute('max'));
+                let currentQuantity = parseInt(event.target.value);
+
+                if (currentQuantity > maxStock) {
+                    event.target.value = maxStock; // Batasi nilai input sesuai dengan stok
+                    alert(`Jumlah pesanan melebihi stok yang tersedia. Stok tersedia: ${maxStock}`);
+                }
+                updateTotal(); // Perbarui total saat jumlah berubah
+            }
+        });
+
 
         // Event listener untuk pilihan metode pembayaran
         document.getElementById('qris').addEventListener('click', function() {
@@ -173,6 +187,13 @@
             paymentDropdown.textContent = paymentMethod;
             updatePaymentButtonState(); // Perbarui status tombol setelah memilih metode
         });
+
+        // Fungsi untuk menghapus isi tabel kasir
+        function clearCashierTable() {
+            let tableBody = document.querySelector('table tbody');
+            tableBody.innerHTML = ''; // Kosongkan isi tabel
+            document.getElementById('total-payment').textContent = 'Rp 0'; // Reset total pembayaran
+        }
 
         // Event listener untuk tombol Proses Pembayaran
         document.querySelector('.btn-success').addEventListener('click', function() {
@@ -201,7 +222,7 @@
                 });
             });
 
-            fetch('{{ route('kasir.prosespembayaran')}}', {
+            fetch('{{route('kasir.prosespembayaran')}}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -216,6 +237,7 @@
                 .then(data => {
                     if (data.success) {
                         console.log('Pembayaran berhasil diproses.');
+                        clearCashierTable(); // Panggil fungsi clear tabel kasir setelah pembayaran berhasil
                     } else {
                         alert('Terjadi kesalahan saat memproses pembayaran.');
                     }
@@ -250,7 +272,7 @@
                         if (data.length > 0) {
                             data.forEach(product => {
                                 let resultItem = `
-                                <div class="dropdown-item product-result mb-2" data-id="${product.product_id}" data-name="${product.product_name}" data-price="${product.harga_jual}" data-quantity="${product.quantity_in_stock}">
+                                <div class="dropdown-item product-result mb-2" data-id="${product.product_id}" data-gambar="${product.gambar}" data-name="${product.product_name}" data-price="${product.harga_jual}" data-quantity="${product.quantity_in_stock}">
                                     <p class="mb-0"><strong>${product.product_name}</strong></p>
                                     <p class="mb-0">ID: ${product.product_id}</p>
                                     <p class="mb-0">Harga: Rp ${product.harga_jual}</p>
@@ -271,29 +293,56 @@
         });
 
         // Event listener untuk menambahkan produk dari hasil pencarian ke tabel
+        // Event listener untuk menambahkan produk dari hasil pencarian ke tabel
         searchResults.addEventListener('click', function(event) {
             if (event.target.closest('.product-result')) {
                 let selectedProduct = event.target.closest('.product-result');
                 let productId = selectedProduct.getAttribute('data-id');
+                let productImage = selectedProduct.getAttribute('data-gambar');
                 let productName = selectedProduct.getAttribute('data-name');
                 let productPrice = selectedProduct.getAttribute('data-price');
                 let productStock = selectedProduct.getAttribute('data-quantity');
 
-                // Tambahkan produk ke tabel
-                let tableBody = document.querySelector('table tbody');
-                let newRow = `
-                    <tr>
-                        <td><img src="../../assets/images/default-product.jpg" alt="${productName}" style="width: 50px; height: 50px;"></td>
-                        <td>${productId}</td>
-                        <td>${productName}</td>
-                        <td>Rp ${parseInt(productPrice).toLocaleString('id-ID')}</td>
-                        <td><input type="number" value="1" class="form-control quantity-input" min="1" max="${productStock}"></td>
-                        <td>Rp ${parseInt(productPrice).toLocaleString('id-ID')}</td>
-                    </tr>`;
-                tableBody.insertAdjacentHTML('beforeend', newRow);
+                // Cek apakah stok produk lebih dari 0 sebelum menambahkan ke tabel
+                if (parseInt(productStock) <= 0) {
+                    alert('Produk ini tidak tersedia (stok habis) dan tidak dapat ditambahkan ke tabel.');
+                    return; // Keluar dari fungsi jika stok habis
+                }
 
-                updateTotal(); // Perbarui total setelah menambahkan produk
-                updatePaymentButtonState();
+                // Cek apakah produk sudah ada di tabel
+                let existingRow = Array.from(document.querySelectorAll('table tbody tr')).find(row => {
+                    return row.cells[1].textContent === productId; // Mencocokkan ID produk
+                });
+
+                if (existingRow) {
+                    // Jika produk sudah ada, tambahkan jumlahnya
+                    let quantityInput = existingRow.querySelector('input.quantity-input');
+                    let currentQuantity = parseInt(quantityInput.value);
+                    let maxStock = parseInt(quantityInput.getAttribute('max'));
+
+                    if (currentQuantity < maxStock) {
+                        quantityInput.value = currentQuantity + 1; // Tambah jumlah
+                        updateTotal(); // Perbarui total
+                    } else {
+                        alert(`Jumlah maksimum untuk produk ini telah tercapai. Stok tersedia: ${maxStock}`);
+                    }
+                } else {
+                    // Jika produk belum ada, tambahkan produk ke tabel
+                    let tableBody = document.querySelector('table tbody');
+                    let newRow = `
+                <tr>
+                    <td><img src="${productImage}" alt="${productName}" style="width: 25px; height: 25px; object-fit: cover;"></td>
+                    <td>${productId}</td>
+                    <td>${productName}</td>
+                    <td>Rp ${parseInt(productPrice).toLocaleString('id-ID')}</td>
+                    <td><input type="number" value="1" class="form-control quantity-input" min="1" max="${productStock}"></td>
+                    <td>Rp ${parseInt(productPrice).toLocaleString('id-ID')}</td>
+                </tr>`;
+                    tableBody.insertAdjacentHTML('beforeend', newRow);
+
+                    updateTotal(); // Perbarui total setelah menambahkan produk
+                    updatePaymentButtonState();
+                }
 
                 // Kosongkan input pencarian dan hasil
                 searchInput.value = '';
@@ -301,6 +350,8 @@
                 searchResults.classList.remove('show'); // Sembunyikan dropdown
             }
         });
+
+
 
         // Event listener untuk perubahan jumlah pada input quantity
         document.querySelector('table tbody').addEventListener('input', function(event) {

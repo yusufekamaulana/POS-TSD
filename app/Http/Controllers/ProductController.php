@@ -54,8 +54,8 @@ class ProductController extends Controller
         $data = $request->all();
         if ($request->hasFile('gambar')) {
             $imageName = time() . '.' . $request->gambar->extension();
-            $request->gambar->move(public_path('assets/images'), $imageName);
-            $data['gambar'] = 'assets/images/' . $imageName;  // Store the path in the database
+            $request->gambar->move(public_path('products'), $imageName);
+            $data['gambar'] = 'products/' . $imageName;  // Store the path in the database
         }
     
         Product::create($data);

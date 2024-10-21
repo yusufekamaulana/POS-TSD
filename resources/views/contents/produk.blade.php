@@ -66,7 +66,7 @@
             <div class="col-md-4 col-lg-2 col-xl-2">
                 <div class="rounded position-relative h-100 shadow-lg clickable-box">
                     <div class="book-img">
-                        <img src="{{$product->gambar}}" class="img-fluid w-100 rounded-top" alt="{{ $product->product_name }}">
+                        <img src="{{ asset($product->gambar) }}" class="img-fluid w-100 rounded-top" alt="{{ $product->product_name }}">
                         <div class="text-white bg-dark px-3 py-1 rounded position-absolute" style="bottom: 75px; left: 10px;">{{ $product->category->category_name }}</div>
                     </div>
                     
