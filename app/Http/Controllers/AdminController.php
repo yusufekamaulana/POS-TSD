@@ -8,7 +8,7 @@ class AdminController extends Controller
 {
     public function index()
     {
-        return view('contents.index'); // Tampilkan view untuk dashboard karyawan
+        return view('contents.dashboard'); // Tampilkan view untuk dashboard karyawan
     }
 
     public function ManageStock()

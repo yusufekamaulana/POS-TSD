@@ -24,7 +24,7 @@ Route::post('/kasir/proses-pembayaran', [KasirController::class, 'prosesPembayar
 Route::middleware(['auth'])->group(function () {
 
     Route::middleware(['role:admin'])->prefix('admin')->group(function () {
-        Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
+        Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
         Route::get('/kelola-pegawai', [AdminController::class, 'ManagePegawai'])->name('admin.manage.pegawai');
     });
 

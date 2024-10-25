@@ -4,20 +4,20 @@
 
 <!-- Alert Sukses -->
 @if (session('success'))
-    <div class="alert alert-success" id="success-message">
-        {{ session('success') }}
-    </div>
+<div class="alert alert-success" id="success-message">
+    {{ session('success') }}
+</div>
 @endif
 
 <!-- Alert Gagal -->
 @if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
+<div class="alert alert-danger">
+    <ul>
+        @foreach ($errors->all() as $error)
+        <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+</div>
 @endif
 
 <!-- Product Categories Table -->
@@ -29,7 +29,7 @@
                 <i class="mdi mdi-loupe btn-icon-prepend"></i>Tambah Kategori
             </button>
         </div>
-        
+
         <table class="table table-bordered">
             <thead>
                 <tr>
@@ -60,7 +60,19 @@
                 <i class="mdi mdi-loupe btn-icon-prepend"></i>Tambah Produk
             </button>
         </div>
-        
+
+        @foreach ($products as $product)
+        <tr>
+            <td>{{ $product->product_name }}</td>
+            <td>{{ $product->price }}</td>
+            <td>
+                <img src="data:image/png;base64,{{ $product->getBarcodeBase64() }}" alt="Barcode">
+            </td>
+            <!-- Kolom lainnya -->
+        </tr>
+        @endforeach
+
+
         <div class="row g-4 mb-4" id="product-list">
             @foreach ($products as $product)
             <div class="col-md-4 col-lg-2 col-xl-2">
@@ -69,7 +81,7 @@
                         <img src="{{ asset($product->gambar) }}" class="img-fluid w-100 rounded-top" alt="{{ $product->product_name }}">
                         <div class="text-white bg-dark px-3 py-1 rounded position-absolute" style="bottom: 75px; left: 10px;">{{ $product->category->category_name }}</div>
                     </div>
-                    
+
                     <!-- Edit and Delete Icons -->
                     <div class="position-absolute top-0 end-0 p-2">
                         <!-- Edit Button -->
@@ -83,7 +95,7 @@
                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus produk ini?')">
                                 <i class="mdi mdi-delete"></i>
                             </button>
-                        </form>                        
+                        </form>
                     </div>
                     <div class="p-2 border bg-light border-light border-top-0 rounded-bottom d-flex flex-column">
                         <h4 class="text-center">{{ $product->product_name }}</h4>
@@ -112,9 +124,9 @@
                                     <label for="category_id{{ $product->product_id }}" class="form-label">Kategori</label>
                                     <select class="form-select" id="category_id{{ $product->product_id }}" name="category_id" required>
                                         @foreach($categories as $category)
-                                            <option value="{{ $category->category_id }}" {{ $product->category_id == $category->category_id ? 'selected' : '' }}>
-                                                {{ $category->category_name }}
-                                            </option>
+                                        <option value="{{ $category->category_id }}" {{ $product->category_id == $category->category_id ? 'selected' : '' }}>
+                                            {{ $category->category_name }}
+                                        </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -171,7 +183,7 @@
                         <select class="form-select" id="category_id" name="category_id" required>
                             <option value="">Pilih Kategori</option>
                             @foreach($categories as $category)
-                                <option value="{{ $category->category_id }}">{{ $category->category_name }}</option>
+                            <option value="{{ $category->category_id }}">{{ $category->category_name }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -235,19 +247,19 @@
 
 <!-- JavaScript for Auto Reload and Dismiss Success Message -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         // Hide the success message after 2 seconds
         if (document.getElementById('success-message')) {
-            setTimeout(function () {
+            setTimeout(function() {
                 document.getElementById('success-message').style.display = 'none';
-            }, 2000);  // 2 seconds delay
+            }, 2000); // 2 seconds delay
         }
 
         // Reload page after form submission
-        document.getElementById('addProductForm').addEventListener('submit', function (event) {
-            setTimeout(function () {
-                location.reload();  // Reload after 2 seconds
-            }, 2000);  // 2 seconds delay
+        document.getElementById('addProductForm').addEventListener('submit', function(event) {
+            setTimeout(function() {
+                location.reload(); // Reload after 2 seconds
+            }, 2000); // 2 seconds delay
         });
     });
 </script>
