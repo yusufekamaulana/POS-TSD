@@ -105,6 +105,9 @@
             left: 0;
             width: 50%;
             z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .container.active .sign-in {
@@ -130,6 +133,12 @@
             /* Menambahkan margin bawah */
         }
 
+        .logo-image {
+            max-width: 200px;
+            height: auto;
+            display: block;
+            margin: auto;
+        }
 
         @keyframes move {
 
@@ -176,13 +185,6 @@
         .container.active .toggle-container {
             transform: translateX(-100%);
             border-radius: 0 150px 100px 0;
-        }
-
-        .logo-image {
-            max-width: auto;
-            height: auto;
-            display: auto;
-            margin: auto;
         }
 
         .toggle {
@@ -310,8 +312,29 @@
 <body>
 
     <div class="container" id="container">
-        <!-- Sign-In Form -->
+        <!-- Panel for image in "Welcome Back" -->
         <div class="form-container sign-in">
+            <img src="/assets/images/logo.png" alt="Logo" class="logo-image">
+        </div>
+
+        <!-- Toggle Panels -->
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="toggle-panel toggle-left">
+                    <h1>Welcome Back!</h1>
+                    <p>"Jangan pernah berhenti berusaha, karena setiap langkah kecil yang kamu ambil, membawa kamu lebih dekat ke tujuan besar."</p>
+                    <button class="hidden" id="login">Back</button>
+                </div>
+                <div class="toggle-panel toggle-right">
+                    <h1>Hello, Sobat UMKM!</h1>
+                    <p>Selamat datang di KasirCerdas! Selamat bekerja dan jangan lupa bahagia!</p>
+                    <button class="hidden" id="Supported">Get Started</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Form in "Hello, Sobat UMKM" -->
+        <div class="form-container sign-up">
             <form method="POST" action="{{ route('login') }}">
                 @csrf
                 <h1>Log in</h1>
@@ -327,22 +350,6 @@
 
                 <button type="submit">Log in</button>
             </form>
-        </div>
-
-        <!-- Toggle Panels -->
-        <div class="toggle-container">
-            <div class="toggle">
-                <div class="toggle-panel toggle-left">
-                    <h1>Welcome Back!</h1>
-                    <p>"Jangan pernah berhenti berusaha, karena setiap langkah kecil yang kamu ambil, membawa kamu lebih dekat ke tujuan besar."</p>
-                    <button class="hidden" id="login">Back</button>
-                </div>
-                <div class="toggle-panel toggle-right">
-                    <h1>Hello, Sobat UMKM!</h1>
-                    <p>Selamat datang di YusufGanteng! Selamat bekerja dan jangan lupa bahagia!</p>
-                    <button class="hidden" id="Supported">Supported By</button>
-                </div>
-            </div>
         </div>
     </div>
 
