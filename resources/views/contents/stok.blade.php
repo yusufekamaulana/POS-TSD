@@ -27,7 +27,7 @@
                     <table class="table table-striped table-hover">
                         <thead>
                             <tr>
-                                <th> Gambar Produk </th>
+                                <th> Barcode Produk </th> <!-- Update column title -->
                                 <th> Kode Barang </th>
                                 <th> Nama Barang </th>
                                 <th> Stok </th>
@@ -38,7 +38,8 @@
                             @foreach($products as $product)
                             <tr>
                                 <td class="py-1">
-                                    <img src="{{ asset($product->gambar) }}" alt="{{ $product->product_name }}" class="w-20 h-25 object-cover rounded">
+                                    <!-- Replace product image with barcode -->
+                                    <img src="data:image/png;base64,{{ $product->getBarcodeBase64() }}" alt="{{ $product->product_name }}" class="w-20 h-25 object-cover rounded">
                                 </td>
                                 <td> {{ $product->product_id }} </td>
                                 <td> {{ $product->product_name }} </td>
