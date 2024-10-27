@@ -78,6 +78,11 @@ class KasirController extends Controller
                 }
             }
 
+            dump($order);
+            dump($idProduct);
+            dump($quantityProduct);
+            dd($priceProduct);
+
             $orderdetail = OrderDetail::create([
                 'order_id' => $order->order_id,
                 'product_id' => $idProduct,

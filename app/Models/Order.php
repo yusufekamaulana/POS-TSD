@@ -10,6 +10,7 @@ class Order extends Model
     use HasFactory;
 
     protected $primaryKey = 'order_id';
+    public $incrementing = True;
 
     protected $fillable = [
         'user_id',
@@ -29,8 +30,18 @@ class Order extends Model
     }
 
     // An order has one payment
-    public function payment()
+    public function payments()
     {
         return $this->hasOne(Payment::class, 'order_id', 'order_id');
     }
+
+    // public function orderDetails()
+    // {
+    //     return $this->hasMany(OrderDetail::class);
+    // }
+
+    // public function payments()
+    // {
+    //     return $this->hasMany(Payment::class);
+    // }
 }
