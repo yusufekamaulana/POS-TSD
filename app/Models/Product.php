@@ -15,7 +15,6 @@ class Product extends Model
 
     protected $fillable = [
         'product_name',
-        'price',
         'category_id',
         'quantity_in_stock',
         'gambar',
@@ -23,6 +22,8 @@ class Product extends Model
         'harga_jual',
         'deskripsi',
     ];
+
+    
 
     // A product belongs to a category
     public function category()

@@ -18,6 +18,11 @@ Route::get('/dashboard/laporan-bulanan', [DashboardController::class, 'laporanBu
 Route::get('/dashboard/produk-laporan', [DashboardController::class, 'produkLaporan']);
 
 
+Route::get('/karyawan/create', [KaryawanController::class, 'create'])->name('karyawan.create');
+Route::post('/karyawan', [KaryawanController::class, 'store'])->name('karyawan.store');
+Route::get('/karyawan', [KaryawanController::class, 'index'])->name('pegawai.index');
+
+
 Route::get('/search-products', [KasirController::class, 'search'])->name('kasir.search');
 Route::post('/kasir/proses-pembayaran', [KasirController::class, 'prosesPembayaran'])->name('kasir.prosespembayaran');
 

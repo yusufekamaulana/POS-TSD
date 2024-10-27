@@ -1,49 +1,106 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    .table-striped tbody tr:nth-child(odd) {
+        background-color: #f9f9f9;
+    }
 
-<div class="row">
-    <div class="col-md-12 grid-margin stretch-card">
-        <div class="card position-relative">
-            <div class="card-body">
-                <div class="row">
-                    <h2 class="text-black text-center">Laporan Harian</h2>
-                    <div class="col-md-12 col-xl-5 d-flex flex-column justify-content-start">
-                        <div class="ml-xl-4 mt-3">
-                            <h6 class="font-weight-light mb-1 text-primary text-center">Pendapatan Hari Ini</h6>
-                            <h2 class="text-primary text-center fs-30 font-weight-medium mb-3">Rp{{ number_format($totalOmset) }}</h2>
+    .table-striped tbody tr:nth-child(even) {
+        background-color: #ffffff;
+    }
 
-                            <h6 class="font-weight-light mb-1 text-success text-center">Keuntungan Hari Ini</h6>
-                            <h2 class="text-success text-center fs-30 font-weight-medium mb-3">Rp{{ number_format($totalKeuntungan) }}</h2>
+    .table-striped tbody tr.empty-row {
+        min-height: 40px;
+    }
 
-                            <h6 class="font-weight-light mb-1 text-info text-center">Total Pelanggan</h6>
-                            <h2 class="text-info text-center fs-30 font-weight-medium mb-3">{{ $jumlahTransaksi }}</h2>
+    /* Perkecil tinggi baris tabel */
+    .table-striped th,
+    .table-striped td {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+
+    /* Atur ukuran maksimal untuk tinggi list-wrapper */
+    .list-wrapper {
+        max-height: 250px;
+        overflow-y: auto;
+    }
+
+    .table-responsive {
+        max-width: 100%;
+    }
+
+</style>
+
+<div class="col-md-12 grid-margin stretch-card">
+    <div class="card position-relative">
+        <div class="card-body">
+            <div class="row mt-4">
+                <div class="col-md-6 grid-margin transparent">
+                    <div class="row">
+                        <div class="col-md-6 mb-4 stretch-card transparent">
+                            <div class="card align-self-center">
+                                <div class="card-people mt-auto">
+                                    <img src="{{ asset('assets/images/laporanharian.png')}}" alt="" style="width: 75%; display: block; margin: auto;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4 stretch-card transparent">
+                            <div class="card card-dark-blue">
+                                <div class="card-body">
+                                    <p class="mb-4">Pendapatan Hari Ini</p>
+                                    <p class="fs-30 mb-2">Rp{{ number_format($totalOmset) }}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col-md-12 col-xl-7">
-                        <div class="row">
-                            <div class="card card-body">
-                                <div class="table-responsive">
-                                    <p class="card-title mb-0 text-center">Transaksi Hari Ini</p>
-                                    <table class="table table-striped table-borderless">
-                                        <thead>
-                                            <tr>
-                                                <th>Waktu</th>
-                                                <th>Jumlah Pembayaran</th>
-                                                <th>Metode Pembayaran</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($riwayatTransaksi as $transaksi)
-                                            <tr>
-                                                <td>{{ $transaksi->time }}</td>
-                                                <td>Rp{{ number_format($transaksi->payment_amount) }}</td>
-                                                <td>{{ $transaksi->payment_method }}</td>
-                                            </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
+                    <div class="row">
+                        <div class="col-md-6 mb-4 mb-lg-0 stretch-card transparent">
+                            <div class="card card-light-blue">
+                                <div class="card-body">
+                                    <p class="mb-4">Keuntungan Hari Ini</p>
+                                    <p class="fs-30 mb-2">Rp{{ number_format($totalKeuntungan) }}</p>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 stretch-card transparent">
+                            <div class="card card-tale">
+                                <div class="card-body">
+                                    <p class="mb-4">Total Pelanggan</p>
+                                    <p class="fs-30 mb-2">{{ $jumlahTransaksi }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 grid-margin stretch-card">
+                    <div class="card mb-0">
+                        <p class="card-title mb-2 text-center">Transaksi Hari Ini</p>
+                        <div class="card card-body">
+                            <div class="table-responsive list-wrapper">
+                                <table class="table table-striped table-borderless">
+                                    <thead>
+                                        <tr>
+                                            <th>Waktu</th>
+                                            <th>Jumlah Pembayaran</th>
+                                            <th>Metode Pembayaran</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse ($riwayatTransaksi as $transaksi)
+                                        <tr>
+                                            <td>{{ $transaksi->time }}</td>
+                                            <td>Rp{{ number_format($transaksi->payment_amount) }}</td>
+                                            <td>{{ $transaksi->payment_method }}</td>
+                                        </tr>
+                                        @empty
+                                        <tr class="empty-row">
+                                            <td colspan="3" class="text-center">Tidak ada transaksi hari ini</td>
+                                        </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -52,6 +109,5 @@
         </div>
     </div>
 </div>
-
 
 @endsection
